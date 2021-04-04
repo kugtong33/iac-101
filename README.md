@@ -357,3 +357,44 @@ Do you want to perform these actions?
   Terraform will perform the actions described above.
   Only 'yes' will be accepted to approve.
 ```
+
+## CloudFormation Module
+
+CloudFormation also support reusable infrastructure functions. We can reuse definitions to minimize the stack size and to abstract complex infrastructure patterns.
+
+```shell
+❯ cfn init
+Initializing new project
+Do you want to develop a new resource(r) or a module(m)?.
+>> m
+What's the name of your module type?
+(<Organization>::<Service>::<Name>::MODULE)
+>> HOV::S3::Bucket::MODULE
+Directory  /home/megamoth/highoutput/cloudformation/fragments  Created
+Initialized a new project in /home/megamoth/highoutput/cloudformation
+
+❯ cfn submit
+Module fragment is valid.
+Successfully submitted type. Waiting for registration with token '7f3b6fa6-1ed9-46d3-8e68-393b7c8c1cb1' to complete.
+Registration complete.
+{'ProgressStatus': 'COMPLETE', 'Description': 'Deployment is currently in DEPLOY_STAGE of status COMPLETED; ', 'TypeArn': 'arn:aws:cloudformation:ap-southeast-1:498457837717:type/module/HOV-S3-Bucket-MODULE', 'TypeVersionArn': 'arn:aws:cloudformation:ap-southeast-1:498457837717:type/module/HOV-S3-Bucket-MODULE/00000001', 'ResponseMetadata': {'RequestId': 'c26548b2-cd84-49aa-8515-3d4008d4a44f', 'HTTPStatusCode': 200, 'HTTPHeaders': {'x-amzn-requestid': 'c26548b2-cd84-49aa-8515-3d4008d4a44f', 'content-type': 'text/xml', 'content-length': '685', 'date': 'Fri, 26 Mar 2021 01:00:32 GMT'}, 'RetryAttempts': 0}}
+
+❯ aws cloudformation describe-type --type MODULE --type-name HOV::S3::Bucket::MODULE
+{
+    "Arn": "arn:aws:cloudformation:ap-southeast-1:498457837717:type/module/HOV-S3-Bucket-MODULE/00000001",
+    "Type": "MODULE",
+    "TypeName": "HOV::S3::Bucket::MODULE",
+    "DefaultVersionId": "00000001",
+    "IsDefaultVersion": true,
+    "Description": "Schema for Module Fragment of type HOV::S3::Bucket::MODULE",
+    "Schema": "{\n    \"typeName\": \"HOV::S3::Bucket::MODULE\",\n    \"description\": \"Schema for Module Fragment of type HOV::S3::Bucket::MODULE\",\n    \"properties\": {\n        \"Parameters\": {\n            \"type\": \"object\",\n            \"properties\": {\n                \"BucketName\": {\n                    \"type\": \"object\",\n                    \"properties\": {\n                        \"Type\": {\n                            \"type\": \"string\"\n                        },\n                        \"Description\": {\n                            \"type\": \"string\"\n
+      }\n                    },\n                    \"required\": [\n                        \"Type\",\n                        \"Description\"\n                    ],\n                    \"description\": \"Name for the bucket\"\n                }\n            }\n        },\n        \"Resources\": {\n            \"properties\": {\n                \"S3Bucket\": {\n                    \"type\": \"object\",\n                    \"properties\": {\n
+               \"Type\": {\n                            \"type\": \"string\",\n                            \"const\": \"AWS::S3::Bucket\"\n
+          },\n                        \"Properties\": {\n                            \"type\": \"object\"\n                        }\n
+ }\n                }\n            },\n            \"type\": \"object\",\n            \"additionalProperties\": false\n        }\n    },\n    \"additionalProperties\": true\n}\n",
+    "DeprecatedStatus": "LIVE",
+    "Visibility": "PRIVATE",
+    "LastUpdated": "2021-03-26T01:00:04.586000+00:00",
+    "TimeCreated": "2021-03-26T01:00:04.586000+00:00"
+}
+```
