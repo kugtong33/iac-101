@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion : "2010-09-09"
+Description: "Your virtual personal server"
+
+Resources:
+  SecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      GroupName: "ec2_firewall"
+      GroupDescription: "your personal server firewall"
+      VpcId: "vpc-c6f987a2"
+      SecurityGroupIngress:
+        - CidrIp: "0.0.0.0/0"
+          FromPort: 22
+          ToPort: 22
+          IpProtocol: "tcp"
+        - CidrIp: "0.0.0.0/0"
+          FromPort: 80
+          ToPort: 80
+          IpProtocol: "tcp"
+        - CidrIp: "0.0.0.0/0"
+          FromPort: 443
+          ToPort: 443
+          IpProtocol: "tcp"
+      SecurityGroupEgress:
+        - CidrIp: "0.0.0.0/0"
+          FromPort: "-1"
+          ToPort: "-1"
+          IpProtocol: "-1"
+
+  EC2:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      ImageId: "ami-01581ffba3821cdf3"
+      InstanceType: "t3.small" # 2 vCPU, 2GB memory
+      BlockDeviceMappings:
+        - DeviceName: "/dev/sda1"
+          Ebs:
+            DeleteOnTermination: true
+            Encrypted: false
+            Iops: 3000
+            VolumeSize: 50
+            VolumeType: "gp3"
+      SecurityGroupIds:
+        - !Ref SecurityGroup
